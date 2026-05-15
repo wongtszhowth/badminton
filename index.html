@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badminton Scoreboard</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            background: #2c3e50; /* Fallback color */
+            background: url('bg.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 20px;
+            width: calc(100% - 40px);
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        /* Top-Left Scoreboard */
+        .score-container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 10px solid #f1c40f;
+            min-width: 550px;
+        }
+
+        .team-row {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .service-indicator {
+            width: 60px;
+            text-align: left;
+            color: #f1c40f;
+            font-size: 3rem;
+            visibility: hidden;
+            flex-shrink: 0;
+        }
+
+        .service-indicator.active {
+            visibility: visible;
+        }
+
+        .team-name {
+            font-weight: bold;
+            font-size: 2.5rem;
+            width: 180px; /* Increased to fit custom names */
+            flex-shrink: 0;
+            text-transform: uppercase;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .score-display {
+            font-size: 8rem;
+            font-weight: bold;
+            width: 180px;
+            text-align: center;
+            flex-shrink: 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Top-Right Match */
+        .games-container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 30px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 350px;
+        }
+
+        .games-label {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: #bdc3c7;
+        }
+
+        .games-score {
+            font-size: 5.25rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .game-team-wrapper {
+            width: 120px;
+        }
+
+        .game-team-info {
+            font-size: 1.2rem;
+            color: #bdc3c7;
+            text-transform: uppercase;
+            margin-bottom: -5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        button {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            transition: background 0.2s;
+        }
+
+        button:hover { background: #666; }
+        
+        /* Bottom Controls */
+        .reset-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0.5;
+            font-size: 0.9rem;
+            background: #c0392b;
+        }
+        .reset-btn:hover { opacity: 1; }
+
+        .music-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 15px;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: #edd015;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay">
+        <div class="score-container">
+            <div class="team-row" id="row-t1">
+                <div class="service-indicator active" id="serve-t1">➤</div>
+                <div class="team-name" id="label-t1">TEAM 1</div>
+                <div class="score-display" id="score-t1">0</div>
+                <div class="controls">
+                    <button onclick="changeScore('t1', 1)">+</button>
+                    <button onclick="changeScore('t1', -1)">-</button>
+                </div>
+            </div>
+            <div class="team-row" id="row-t2">
+                <div class="service-indicator" id="serve-t2">➤</div>
+                <div class="team-name" id="label-t2">TEAM 2</div>
+                <div class="score-display" id="score-t2">0</div>
+                <div class="controls">
+                    <button onclick="changeScore('t2', 1)">+</button>
+                    <button onclick="changeScore('t2', -1)">-</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="games-container">
+            <div class="games-label">Match</div>
+            <div class="games-score">
+                <div class="game-team-wrapper">
+                    <div class="game-team-info" id="win-label-t1">T1</div>
+                    <span id="win-t1">0</span>
+                </div>
+                <div style="color: #f1c40f; margin-top: 20px;">—</div>
+                <div class="game-team-wrapper">
+                    <div class="game-team-info" id="win-label-t2">T2</div>
+                    <span id="win-t2">0</span>
+                </div>
+            </div>
+            <div class="controls" style="justify-content: center; margin-top: 10px; width: 100%;">
+                <button onclick="changeWin('t1', 1)">+</button>
+                <button onclick="changeWin('t1', -1)">-</button>
+                <div style="width: 40px;"></div> 
+                <button onclick="changeWin('t2', 1)">+</button>
+                <button onclick="changeWin('t2', -1)">-</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="BWF Anthem.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <button class="music-btn" onclick="toggleMusic()" id="musicIcon">🎵</button>
+    <button class="reset-btn" onclick="resetGame()">Reset Game</button>
+
+    <script>
+        let scores = { t1: 0, t2: 0 };
+        let wins = { t1: 0, t2: 0 };
+        let server = 't1';
+        let isPlaying = false;
+
+        // 1. Prompt for team names on load
+        window.onload = function() {
+            const team1 = prompt("Enter Name for Team 1:", "CSL") || "CSL";
+            const team2 = prompt("Enter Name for Team 2:", "Opponent") || "Opponent";
+            
+            document.getElementById('label-t1').innerText = team1;
+            document.getElementById('win-label-t1').innerText = team1;
+            document.getElementById('label-t2').innerText = team2;
+            document.getElementById('win-label-t2').innerText = team2;
+        };
+
+        function changeScore(team, val) {
+            scores[team] = Math.max(0, scores[team] + val);
+            if (val > 0) {
+                server = team;
+            }
+            updateDisplay();
+        }
+
+        function changeWin(team, val) {
+            wins[team] = Math.max(0, wins[team] + val);
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('score-t1').innerText = scores.t1;
+            document.getElementById('score-t2').innerText = scores.t2;
+            document.getElementById('win-t1').innerText = wins.t1;
+            document.getElementById('win-t2').innerText = wins.t2;
+
+            document.getElementById('serve-t1').classList.toggle('active', server === 't1');
+            document.getElementById('serve-t2').classList.toggle('active', server === 't2');
+        }
+
+        // 2. Reset only current game scores
+        function resetGame() {
+            if(confirm("Reset current game scores? Match scores will be kept.")) {
+                scores = { t1: 0, t2: 0 };
+                updateDisplay();
+            }
+        }
+
+        // 3. Music Toggle Logic
+        function toggleMusic() {
+            const music = document.getElementById('bgMusic');
+            const btn = document.getElementById('musicIcon');
+            
+            if (isPlaying) {
+                music.pause();
+                music.currentTime = 0;
+                btn.innerText = "🎵";
+                btn.style.background = "#edd015";
+            } else {
+                music.play().catch(e => alert("Please ensure music.mp3 is in the folder."));
+                btn.innerText = "⏸";
+                btn.style.background = "#e67e22";
+            }
+            isPlaying = !isPlaying;
+        }
+    </script>
+</body>
+</html>
